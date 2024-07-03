@@ -19,7 +19,7 @@ jobs:
           cd docs
           sphinx-build source build
       - name: Deploy to GitHub Pages
-        uses: actions/upload-pages-artifact
+        uses: peaceiris/actions-gh-pages@v4
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           publish_branch: master
