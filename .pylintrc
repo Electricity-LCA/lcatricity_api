@@ -1,0 +1,12 @@
+[LOGGING]
+
+# Format style used to check logging format string. `old` means using %
+# formatting, `new` is for `{}` formatting,and `fstr` is for f-strings.
+logging-format-style=new
+
+# Ignore pedantic linting warnings
+disable=
+    invalid-name,
+    line-too-long,
+    trailing-whitespace,
+    missing-final-newline
