@@ -1,4 +1,4 @@
-name: documentation
+name: documentation-v2
 
 on: [push, pull_request, workflow_dispatch]
 
