@@ -4,7 +4,7 @@ LCAtricity API
 This repository contains the source code for the API serving LCAtricity.
 
 # Documentation
-See the documentation [here](https://electricity-lca.github.io/lcatricity_api/)
+See the documentation [here](electricity-lca.github.io)
 
 The raw files can be found in the [docs](/docs) directory in this repository
 
