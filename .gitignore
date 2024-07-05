@@ -90,3 +90,5 @@ target/
 
 # Mypy cache
 .mypy_cache/
+/docker-compose.local.yml
+/docker-compose.yml

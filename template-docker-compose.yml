@@ -1,0 +1,36 @@
+version: '1.0'
+services:
+    lcatricity_api:
+        build: ./lcatricity_api
+
+        container_name: lcatricity_api
+
+        ports:
+        - target: 9000
+          published: 9000
+          protocol: tcp
+          mode: bridge
+
+        environment:
+            ELEC_LCA_DB_HOST: host.docker.internal
+            ELEC_LCA_DB_NAME: 'electricity_lca'
+            ELEC_LCA_DB_LOGIN: 'electricity_lca_admin'
+            ELEC_LCA_DB_PWD: ''
+            ELEC_LCA_DB_PORT: '5432'
+            ELEC_LCA_API_URL: host.docker.internal
+            ELEC_LCA_API_PORT: '9000'
+            ELEC_LCA_API_VERSION: '0.1.0'
+            ENTSOE_SECURITY_TOKEN: ''
+        extra_hosts:
+                - "host.docker.internal:host-gateway"
+
+
+
+    out_there_tests:
+        build: ./tests/out_there_tests
+        depends_on:
+            -   lcatricity_api
+        volumes:
+          - ./tests/out_there_tests:/usr/src/app/
+
+        command: python -m pytest -k test_db_connection
