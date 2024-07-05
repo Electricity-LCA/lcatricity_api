@@ -12,6 +12,7 @@ Welcome to LCAtricity API's documentation!
 
    main
    modules
+   installation-setup
 
 
 Indices and tables
