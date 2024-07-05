@@ -2,7 +2,7 @@ Set up LCAtricity
 =================
 
 ::
-*PSST* ... If you just want to check out the API, we're live at `lcatricity.live <http://lcatricity.live>`__.
+*PSST* ... If you just want to check out the API, we're live at `http://example.lcatricity.live:8000/docs <http://example.lcatricity.live:8000/docs>`__.
 ::
 
 Set up environment
