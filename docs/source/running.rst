@@ -1,17 +1,15 @@
 Running API via Docker
 ----------------------
 
+Create a copy of `template-docker-compose.yml` and update it to ensure the ports exposed match your configuration (e.g. are you running your api on port 8000 or 80, then change EXPOSE 8000 to EXPOSE 80, same for the Postgres database)
+
+The environment variables in the `docker-compose.yml` should be the same as those specified in your .env file
+
+Then run
+
 .. code:: commandline
 
-   docker image build . -t elec_lca_microservice:latest
+   docker compose up
 
-then
 
-.. code:: commandline
-
-   docker container run -d --rm -p 80:8000 -p 25060:25060 elec_lca_microservice:latest
-
-Note that you should change ``25060`` to the port used by the (Postgres)
-database you are using to store the data, as specified in your .env file
-
-This should start a web browser showing a dashboard on localhost:8900
+This should start a web browser showing a dashboard on localhost:9000

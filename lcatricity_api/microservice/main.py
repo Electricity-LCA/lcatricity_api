@@ -22,6 +22,14 @@ DB_NAME = os.getenv('ELEC_LCA_DB_NAME')
 USER = os.getenv('ELEC_LCA_DB_LOGIN')
 PASSWORD = os.getenv('ELEC_LCA_DB_PWD')
 DB_PORT = os.getenv('ELEC_LCA_DB_PORT')
+API_PORT = os.getenv('ELEC_LCA_API_PORT')
+try:
+    API_PORT = int(API_PORT)
+except TypeError as e:
+    raise TypeError(f"API_PORT set in .env is invalid. Value should be an integer. Current value {API_PORT}")
+except Exception as e:
+    raise Exception("Other issue with API_PORT in .env")
+
 API_VERSION = os.getenv('ELEC_LCA_API_VERSION')
 
 # Connect to postgres database
@@ -133,4 +141,4 @@ async def calculate_impact(date_start, region_code: str, generation_type_id: int
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, filename='api.log')
-    uvicorn.run(app, port=80)
+    uvicorn.run(app, port=API_PORT)
