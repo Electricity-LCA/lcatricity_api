@@ -14,10 +14,10 @@ Set up environment
 3. Create an empty database called ``electricity_lca`` and create a user
    account with privilege to create tables on the database
 4. Clone this repository
-5. Copy ``template_project.env`` to a new file ``.env`` and fill the
+5. Copy ``.env.template`` to a new file ``.env`` and fill the
    copied file with ``ENTSOE_SECURITY_TOKEN`` = your ENTSOE security
-   token. Fill the connection details to your postgres sql instance
-6. Create virtual environment
+   token. Fill also the connection details to your postgres sql instance
+6. Create Python virtual environment
 
 .. code:: commandline
 
