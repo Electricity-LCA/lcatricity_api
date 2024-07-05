@@ -11,14 +11,11 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt /usr/src/app/requirements.txt
+
+ADD requirements.txt /usr/src/app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # RUN python3 -m ensurepip --upgrade
 COPY ./ /usr/src/app/lcatricity_api
 
-# For microservice background NOTE THIS MUST BE SET MANUALLY TO MATCH .env
-EXPOSE 9000
-
 ENV PYTHONPATH="/lcatricity_api"
-CMD uvicorn lcatricity_api.microservice.main:app --reload --host 0.0.0.0 --port 9000

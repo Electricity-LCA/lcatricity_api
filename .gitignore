@@ -90,5 +90,10 @@ target/
 
 # Mypy cache
 .mypy_cache/
+
+# Don't include docker-compose files because they contain sensitive information
 /docker-compose.local.yml
 /docker-compose.yml
+/docker-compose.digitalocean.yml
+/.env.local
+/.env.digitalocean
