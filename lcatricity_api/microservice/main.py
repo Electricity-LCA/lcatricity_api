@@ -17,11 +17,11 @@ from lcatricity_api.microservice.constants import ServerError
 from lcatricity_api.microservice.generation import get_electricity_generation_df
 
 load_dotenv()
-HOST = os.getenv('ELEC_LCA_HOST')
+HOST = os.getenv('ELEC_LCA_DB_HOST')
 DB_NAME = os.getenv('ELEC_LCA_DB_NAME')
-USER = os.getenv('ELEC_LCA_USER')
-PASSWORD = os.getenv('ELEC_LCA_PASSWORD')
-API_PORT = os.getenv('API_PORT')
+USER = os.getenv('ELEC_LCA_DB_LOGIN')
+PASSWORD = os.getenv('ELEC_LCA_DB_PWD')
+API_PORT = os.getenv('ELEC_LCA_DB_PORT')
 
 # Connect to postgres database
 engine = sqla.create_engine(sqla.engine.url.URL.create(
