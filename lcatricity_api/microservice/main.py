@@ -23,6 +23,7 @@ USER = os.getenv('ELEC_LCA_DB_LOGIN')
 PASSWORD = os.getenv('ELEC_LCA_DB_PWD')
 DB_PORT = os.getenv('ELEC_LCA_DB_PORT')
 API_PORT = os.getenv('ELEC_LCA_API_PORT')
+
 try:
     API_PORT = int(API_PORT)
 except TypeError as e:
@@ -38,7 +39,8 @@ engine = sqla.create_engine(sqla.engine.url.URL.create(
     host=HOST,
     database=DB_NAME,
     username=USER,
-    password=PASSWORD
+    password=PASSWORD,
+    port=DB_PORT
 ))
 cache = load_common_data_from_db(sql_engine=engine)
 
