@@ -43,3 +43,8 @@ cd docs
 make clean html
 ```
 (or use make.bat on windows)
+
+Export the docker image:
+```bash
+docker image save --output lcatricity_api_0_1_0.tar lcatricity_api-lcatricity_api:latest
+```
