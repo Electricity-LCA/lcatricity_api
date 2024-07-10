@@ -11,7 +11,8 @@ import uvicorn
 from starlette import status
 from starlette.responses import RedirectResponse
 
-from lcatricity_api.data.get_common_data import load_common_data_from_db
+from lcatricity_api.microservice.cache_queries import list_regions_in_cache, list_generation_types_in_cache, \
+    list_generation_type_mappings_in_cache, list_impact_categories_df_in_cache, init_cache
 from lcatricity_api.microservice.calculate import ImpactResultSchema, calculate_impact_df
 from lcatricity_api.microservice.constants import ServerError
 from lcatricity_api.microservice.generation import get_electricity_generation_df
@@ -42,7 +43,7 @@ engine = sqla.create_engine(sqla.engine.url.URL.create(
     password=PASSWORD,
     port=DB_PORT
 ))
-cache = load_common_data_from_db(sql_engine=engine)
+init_cache(engine)
 
 app = FastAPI(title="LCAtricity API", description="Assess environmental impacts of electricity generation on multiple dimensions.", version=API_VERSION)
 
@@ -56,7 +57,7 @@ def get_main():
 @app.get('/docs')
 def get_docs():
     """Get documentation"""
-    return get_swagger_ui_html(title='API documentation for elc_lca')
+    return get_swagger_ui_html(title='API documentation for LCAtricity')
 
 
 @app.get('/list_regions')
@@ -68,7 +69,7 @@ async def list_regions():
     :return:
     JSON
     """
-    regions_df = cache.regions
+    regions_df = await list_regions_in_cache()
     return Response(regions_df.to_json(orient='records'), media_type="application/json")
 
 
@@ -80,7 +81,7 @@ async def list_generation_types():
     :return:
     JSON
     """
-    generation_types_df = cache.generation_types
+    generation_types_df = await list_generation_types_in_cache()
     return Response(generation_types_df.to_json(orient='records'), media_type="application/json")
 
 
@@ -93,8 +94,21 @@ async def list_generation_type_mappings():
     :return:
     JSON
     """
-    generation_type_mappings_df = cache.generation_type_mappings
+    generation_type_mappings_df = await list_generation_type_mappings_in_cache()
     return Response(generation_type_mappings_df.to_json(orient='records'), media_type="application/json")
+
+
+@app.get('/list_impact_categories')
+async def list_impact_categories():
+    """
+    List the environmental impacts that can be calculated via the API
+
+    :return:
+    JSON
+    """
+
+    impact_categories_df = await list_impact_categories_df_in_cache()
+    return Response(impact_categories_df.to_json(orient='records'), media_type="application/json")
 
 
 @app.get('/generation')
