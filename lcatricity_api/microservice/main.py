@@ -15,7 +15,7 @@ from lcatricity_api.microservice.cache_queries import list_regions_in_cache, lis
     list_generation_type_mappings_in_cache, list_impact_categories_df_in_cache, init_cache
 from lcatricity_api.microservice.calculate import ImpactResultSchema, calculate_impact_df
 from lcatricity_api.microservice.constants import ServerError
-from lcatricity_api.microservice.data_availability import get_regions_with_generation_data
+from lcatricity_api.microservice.data_availability import get_regions_with_generation_data, get_datapoints_per_day
 from lcatricity_api.microservice.generation import get_electricity_generation_df
 
 load_dotenv()
@@ -109,14 +109,28 @@ async def availability_regions(datestamp:Optional[str]=None):
         :return:
         """
 
-    region_ids_df = await get_regions_with_generation_data(engine,datestamp)
-    return Response(region_ids_df.to_json(orient='records'), media_type="application/json")
+    data_availability_df = await get_regions_with_generation_data(engine,datestamp)
+    return Response(data_availability_df.to_json(orient='records'), media_type="application/json")
+
+
+@app.get("/datapoints_count_by_day")
+async def datapoints_count_by_day():
+    """
+        Get info on the count of generation datapoints per day per region. Returns JSON with keys Datestamp (in the form YYYY-MM-DD), RegionId, CountDataPoints
+
+        :return:
+        """
+
+    datapoint_counts_df = await get_datapoints_per_day(engine)
+    return Response(datapoint_counts_df.to_json(orient='records'), media_type="application/json")
 
 
 @app.get('/list_impact_categories')
 async def list_impact_categories():
     """
     List the environmental impacts that can be calculated via the API
+
+    WARNING: This operation may take some time to return
 
     :return:
     JSON

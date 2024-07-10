@@ -35,3 +35,21 @@ async def get_regions_with_generation_data(engine, datestamp:Optional[str]=None)
                                                                 ).group_by(ElectricityGeneration.RegionId)
         region_ids_df = pd.read_sql(regions_with_data_statement.statement, session.bind)
     return region_ids_df
+
+
+async def get_datapoints_per_day(engine) -> pd.DataFrame:
+    """
+    Get info on the count of generation datapoints per day per region. Returns a pandas dataframe with columns Datestamp (in the form YYYY-MM-DD), RegionId, CountDataPoints
+
+    I
+    :param engine:
+    :return:
+    """
+    session_obj = sessionmaker(bind=engine)
+    with session_obj() as session:
+        data_per_day_query = session.query(func.to_char(ElectricityGeneration.DateStamp,"YYYY-MM-DD").label('Datestamp'),
+                                                    ElectricityGeneration.RegionId,
+                                                    func.count(ElectricityGeneration.DateStamp).label('CountDataPoints')
+                                                    ).group_by(func.to_char(ElectricityGeneration.DateStamp,"YYYY-MM-DD"),ElectricityGeneration.RegionId)
+        data_per_day_df = pd.read_sql(data_per_day_query.statement, session.bind)
+    return data_per_day_df
