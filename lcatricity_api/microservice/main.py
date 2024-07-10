@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 import sqlalchemy as sqla
@@ -15,6 +15,7 @@ from lcatricity_api.microservice.cache_queries import list_regions_in_cache, lis
     list_generation_type_mappings_in_cache, list_impact_categories_df_in_cache, init_cache
 from lcatricity_api.microservice.calculate import ImpactResultSchema, calculate_impact_df
 from lcatricity_api.microservice.constants import ServerError
+from lcatricity_api.microservice.data_availability import get_regions_with_generation_data
 from lcatricity_api.microservice.generation import get_electricity_generation_df
 
 load_dotenv()
@@ -96,6 +97,20 @@ async def list_generation_type_mappings():
     """
     generation_type_mappings_df = await list_generation_type_mappings_in_cache()
     return Response(generation_type_mappings_df.to_json(orient='records'), media_type="application/json")
+
+
+@app.get("/available_data_region")
+async def availability_regions(datestamp:Optional[str]=None):
+    """
+        Get info on the available generation data per region. Returns a JSON with keys RegionId, EarliestTimeStamp, LatestTimeStamp,CountDataPoints
+
+        I
+        :param datestamp: Datestamp in the format yyyy-mm-dd. If None, then will return information on the earliest, last and count of data points for the region stored over all time in the database.
+        :return:
+        """
+
+    region_ids_df = await get_regions_with_generation_data(engine,datestamp)
+    return Response(region_ids_df.to_json(orient='records'), media_type="application/json")
 
 
 @app.get('/list_impact_categories')
