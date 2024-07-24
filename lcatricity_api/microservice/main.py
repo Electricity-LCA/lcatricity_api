@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import Any, Optional
+from datetime import datetime, timedelta
+from typing import Any, Optional, List
 
 import pandas as pd
 import sqlalchemy as sqla
@@ -11,9 +12,10 @@ import uvicorn
 from starlette import status
 from starlette.responses import RedirectResponse
 
+from lcatricity_api.microservice.ResponseModels import GenerationResponseModel, ImpactResultSchema
 from lcatricity_api.microservice.cache_queries import list_regions_in_cache, list_generation_types_in_cache, \
     list_generation_type_mappings_in_cache, list_impact_categories_df_in_cache, init_cache
-from lcatricity_api.microservice.calculate import ImpactResultSchema, calculate_impact_df
+from lcatricity_api.microservice.calculate import calculate_impact_df
 from lcatricity_api.microservice.constants import ServerError
 from lcatricity_api.microservice.data_availability import get_regions_with_generation_data, get_datapoints_per_day
 from lcatricity_api.microservice.generation import get_electricity_generation_df
@@ -46,13 +48,15 @@ engine = sqla.create_engine(sqla.engine.url.URL.create(
 ))
 init_cache(engine)
 
-app = FastAPI(title="LCAtricity API", description="Assess environmental impacts of electricity generation on multiple dimensions.", version=API_VERSION)
+app = FastAPI(title="LCAtricity API",
+              description="Assess environmental impacts of electricity generation on multiple dimensions.",
+              version=API_VERSION)
 
 
 @app.get('/')
 def get_main():
     """Redirect the root url to the documentation page"""
-    return RedirectResponse('/docs',status_code=status.HTTP_302_FOUND)
+    return RedirectResponse('/docs', status_code=status.HTTP_302_FOUND)
 
 
 @app.get('/docs')
@@ -100,7 +104,7 @@ async def list_generation_type_mappings():
 
 
 @app.get("/available_data_region")
-async def availability_regions(datestamp:Optional[str]=None):
+async def availability_regions(datestamp: Optional[str] = None):
     """
         Get info on the available generation data per region. Returns a JSON with keys RegionId, EarliestTimeStamp, LatestTimeStamp,CountDataPoints
 
@@ -109,7 +113,7 @@ async def availability_regions(datestamp:Optional[str]=None):
         :return:
         """
 
-    data_availability_df = await get_regions_with_generation_data(engine,datestamp)
+    data_availability_df = await get_regions_with_generation_data(engine, datestamp)
     return Response(data_availability_df.to_json(orient='records'), media_type="application/json")
 
 
@@ -142,17 +146,19 @@ async def list_impact_categories():
     return Response(impact_categories_df.to_json(orient='records'), media_type="application/json")
 
 
-@app.get('/generation')
-async def get_electricity_generation(date_start, region_code: str, generation_type_id: int):
+@app.get('/generation', response_model=List[GenerationResponseModel])
+async def get_electricity_generation(date_start: str, region_code: str, date_end: Optional[str] = None,
+                                     generation_type_id: Optional[int] = None):
     """
-    Get the electricity generation on a given date (e.g. 2024-02-01) for a given region (e.g. NL or FR) and an
+    Get the electricity generation on a given time period (e.g. 2024-02-01 to 2024-02-02) for a given region (e.g. NL or FR) and optionally an
     electricity regions type (e.g. 4 for fossil gas)
 
     :return:
     JSON
     """
     try:
-        df = await get_electricity_generation_df(date_start, None, region_code, generation_type_id, engine=engine)
+        df = await get_electricity_generation_df(date_start, region_code=region_code, engine=engine,
+                                                 generation_type_id=generation_type_id, date_end=date_end)
     except TypeError as e:
         return Response(status_code=400, content=str(e))
     except ValueError as e:
@@ -161,20 +167,27 @@ async def get_electricity_generation(date_start, region_code: str, generation_ty
         return Response(status_code=500, content=str(e))
     if not isinstance(df, pd.DataFrame):
         return Response(status_code=500)
-    return Response(df.to_json(orient='records'), media_type="application/json")
+    return Response(df.to_json(orient='records',date_format='iso'), media_type="application/json")
 
 
 @app.get('/calculate', response_model=ImpactResultSchema)
-async def calculate_impact(date_start, region_code: str, generation_type_id: int) -> Any:
+async def calculate_impact(date_start: str, region_code: str, impact_category_id: int, date_end: str = None) -> Any:
     """
     Get environmental impacts of electricity generation on given date (e.g. 2024-02-01) for a given region (e.g. NL or FR) and an electricity regions type (e.g. 4 for fossil gas)
+
+    By default date_end will be date_start + 1 day if left None
 
     :return
     ImpactResultSchema
     """
-
+    assert isinstance(date_start, str)
+    if date_end is None:
+        start_datetime = datetime.strptime(date_start, '%Y-%m-%d')
+        end_datetime = start_datetime + timedelta(days=1)
+        date_end = end_datetime.strftime('%Y-%m-%d')
     try:
-        impact_df = await calculate_impact_df(date_start, region_code, generation_type_id, engine=engine)
+        impact_df = await calculate_impact_df(date_start, date_end, region_code, impact_category_id=impact_category_id,
+                                              engine=engine)
     except TypeError as e:
         return Response(status_code=400, content=str(e))
     except ValueError as e:
@@ -183,7 +196,7 @@ async def calculate_impact(date_start, region_code: str, generation_type_id: int
         return Response(status_code=500, content=str(e))
     if not isinstance(impact_df, pd.DataFrame):
         return Response(status_code=500)
-    return Response(impact_df.to_json(orient='records'), media_type='text/json')
+    return Response(impact_df.to_json(orient='records', date_format='iso'), media_type='text/json')
 
 
 if __name__ == '__main__':

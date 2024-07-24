@@ -1,6 +1,7 @@
 import logging
+from datetime import datetime
+
 import pandas as pd
-from pydantic import BaseModel
 from sqlalchemy.orm import sessionmaker
 
 from lcatricity_api.microservice.constants import conversion_factors
@@ -8,33 +9,21 @@ from lcatricity_api.microservice.generation import get_electricity_generation_df
 from lcatricity_dataschema.base import EnvironmentalImpacts
 
 
-class ImpactResultSchema(BaseModel):
-    GenerationUnit: str
-    PerUnit: str
-    ConversionFactor: float
-    AggregatedGenerationConverted: float
-    EnvironmentalImpact: float
-    model_config = {
-        "json_schema_extra": {
-            "examples": [{
-                "GenerationUnit": "MJ",
-                "PerUnit": "kWh",
-                "ConversionFactor":3.6,
-                "AggregatedGenerationConverted":2,
-                "EnvironmentalImpact":3
-            }
-            ]
-        }
-    }
-
-
-async def calculate_impact_df(date_start, region_code: str, generation_type_id: int, engine):
+async def calculate_impact_df(date_start: str, date_end: str, region_code: str, impact_category_id: int, engine):
     logging.debug(
-        f'Getting electricity generation data for date {date_start}, region code {region_code}, generation type id {generation_type_id}')
-    generation_df = await get_electricity_generation_df(date_start, None, region_code, generation_type_id,
-                                                        engine=engine)
+        f'Getting electricity generation data for date {date_start}, region code {region_code}, impact category id {impact_category_id}')
+    try:
+        datetime_start = datetime.strptime(date_start, '%Y-%m-%d')
+        datetime_end = datetime.strptime(date_end, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        raise ValueError(
+            f'Could not handle start or end date in the period `{date_start}`-`{date_end}`. Check your input is in the form yyyy-mm-dd')
+
+    generation_df = await get_electricity_generation_df(date_start, region_code, engine=engine, generation_type_id=None,
+                                                        date_end=date_end)
     logging.debug('Retrieved generation data')
     environmental_impacts_df = await get_calculation_data(engine=engine)
+
 
     # Annotate generation data with units # TODO: Move to DB
     if 'GenerationUnit' not in generation_df.columns.to_list():
@@ -57,6 +46,8 @@ async def calculate_impact_df(date_start, region_code: str, generation_type_id: 
     calculation_df['EnvironmentalImpact'] = calculation_df['AggregatedGenerationConverted']*calculation_df['ImpactValue']
 
     return calculation_df
+
+
 
 
 async def get_calculation_data(engine) -> pd.DataFrame:
