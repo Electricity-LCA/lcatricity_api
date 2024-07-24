@@ -17,6 +17,8 @@ async def list_regions_in_cache() -> pd.DataFrame:
     :return:
     DF
     """
+    if cache is None:
+        raise ValueError('Cache is not loaded')
     return cache.regions
 
 
@@ -27,6 +29,8 @@ async def list_generation_types_in_cache() -> pd.DataFrame:
     :return:
     JSON
     """
+    if cache is None:
+        raise ValueError('Cache is not loaded')
     return cache.generation_types
 
 
@@ -38,6 +42,8 @@ async def list_generation_type_mappings_in_cache() -> pd.DataFrame:
     :return:
     JSON
     """
+    if cache is None:
+        raise ValueError('Cache is not loaded')
     return cache.generation_type_mappings
 
 
@@ -48,5 +54,6 @@ async def list_impact_categories_df_in_cache() -> pd.DataFrame:
     :return:
     JSON
     """
-
+    if cache is None:
+        raise ValueError('Cache is not loaded')
     return cache.impact_categories

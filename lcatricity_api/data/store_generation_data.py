@@ -5,7 +5,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
-from lcatricity_api.orm.base import sql_alchemy_base
+from lcatricity_dataschema.base import sql_alchemy_base
 
 
 def store_generation_data_to_db(

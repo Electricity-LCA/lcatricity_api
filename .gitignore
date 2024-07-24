@@ -93,7 +93,7 @@ target/
 
 # Don't include docker-compose files because they contain sensitive information
 /docker-compose.local.yml
-/docker-compose.yml
+/docker-compose-localapi_remotedb.yml
 /docker-compose.digitalocean.yml
 /.env.local
 /.env.digitalocean

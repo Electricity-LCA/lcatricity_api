@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 from lcatricity_api.microservice.constants import conversion_factors
 from lcatricity_api.microservice.generation import get_electricity_generation_df
-from lcatricity_api.orm.base import EnvironmentalImpacts
+from lcatricity_dataschema.base import EnvironmentalImpacts
 
 
 class ImpactResultSchema(BaseModel):

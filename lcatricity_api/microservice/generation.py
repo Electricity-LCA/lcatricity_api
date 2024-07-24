@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy.orm import sessionmaker
 
 from lcatricity_api.microservice.constants import ServerError, ROW_LIMIT
-from lcatricity_api.orm.base import Regions, ElectricityGeneration
+from lcatricity_dataschema.base import Regions, ElectricityGeneration
 
 
 async def get_electricity_generation_df(date_start, date_end, region_code: str, generation_type_id: int, engine) -> pd.DataFrame:

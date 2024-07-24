@@ -48,3 +48,14 @@ Export the docker image:
 ```bash
 docker image save --output lcatricity_api_0_1_0.tar lcatricity_api-lcatricity_api:latest
 ```
+
+# Set up on Raspberry Pi
+Tested on a Raspberry Pi 4, with 32 GB SD card (use a good one)
+
+Trying to install on solar power on a cloudy day is not likely to work. Use a battery pack :)
+
+1. Get Docker
+```bash
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+```

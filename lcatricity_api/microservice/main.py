@@ -114,14 +114,16 @@ async def availability_regions(datestamp:Optional[str]=None):
 
 
 @app.get("/datapoints_count_by_day")
-async def datapoints_count_by_day():
+async def datapoints_count_by_day(region_code: Optional[str]):
     """
         Get info on the count of generation datapoints per day per region. Returns JSON with keys Datestamp (in the form YYYY-MM-DD), RegionId, CountDataPoints
+
+        :param region_code: Optional[str]. A region code to filter on. If None, searches across all regions. Must be an short name in string value form, like `FR`
 
         :return:
         """
 
-    datapoint_counts_df = await get_datapoints_per_day(engine)
+    datapoint_counts_df = await get_datapoints_per_day(engine, region_code=region_code)
     return Response(datapoint_counts_df.to_json(orient='records'), media_type="application/json")
 
 
