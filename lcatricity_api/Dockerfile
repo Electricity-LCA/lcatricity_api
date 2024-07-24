@@ -4,6 +4,12 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* \
+
 # Prevent Python from writing pyc files to disc
 ENV PYTHONDONTWRITEBYTECODE 1
 # Prevent Python from buffering stdout and stderr

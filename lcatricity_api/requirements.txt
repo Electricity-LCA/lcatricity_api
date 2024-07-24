@@ -9,3 +9,4 @@ sphinx
 pytest
 httpx
 starlette
+lcatricity_dataschema @ git+https://github.com/Electricity-LCA/lcatricity_dataschema@0.0.3
