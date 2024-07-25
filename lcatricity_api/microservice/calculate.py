@@ -25,7 +25,7 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
     if generation_df.empty:
         raise NoDataAvailableError(f"No data available for region '{region_code}' in the period '{datetime_start}' - '{datetime_end}'")
     logging.debug('Retrieved generation data')
-    environmental_impacts_df = await get_calculation_data(engine=engine)
+    environmental_impacts_df = await get_calculation_data(engine=engine,impact_category_id=impact_category_id)
 
 
     # Annotate generation data with units # TODO: Move to DB
@@ -53,10 +53,13 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
 
 
 
-async def get_calculation_data(engine) -> pd.DataFrame:
+async def get_calculation_data(engine,impact_category_id:Optional[int]=None) -> pd.DataFrame:
     session_obj = sessionmaker(bind=engine)
     with session_obj() as session:
-        impacts_query = session.query(EnvironmentalImpacts)
+        if impact_category_id is None:
+            impacts_query = session.query(EnvironmentalImpacts)
+        else:
+            impacts_query = session.query(EnvironmentalImpacts).where(EnvironmentalImpacts.ImpactCategoryId==impact_category_id)
         impacts_df = pd.read_sql(impacts_query.statement, session.bind)
         # if isinstance(EnvironmentalImpactsSchema.validate(impacts_df), (SchemaError, SchemaErrors)):
         #     logging.error('Schema error in environmental impacts data returned from database')
