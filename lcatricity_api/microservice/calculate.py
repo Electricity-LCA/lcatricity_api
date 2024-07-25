@@ -1,15 +1,16 @@
 import logging
 from datetime import datetime
+from typing import Optional
 
 import pandas as pd
 from sqlalchemy.orm import sessionmaker
 
-from lcatricity_api.microservice.constants import conversion_factors
+from lcatricity_api.microservice.constants import conversion_factors, NoDataAvailableError
 from lcatricity_api.microservice.generation import get_electricity_generation_df
 from lcatricity_dataschema.base import EnvironmentalImpacts
 
 
-async def calculate_impact_df(date_start: str, date_end: str, region_code: str, impact_category_id: int, engine):
+async def calculate_impact_df(date_start: str, date_end: str, region_code: str, impact_category_id: int, engine, max_rows: Optional[int] = 1000):
     logging.debug(
         f'Getting electricity generation data for date {date_start}, region code {region_code}, impact category id {impact_category_id}')
     try:
@@ -21,6 +22,8 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
 
     generation_df = await get_electricity_generation_df(date_start, region_code, engine=engine, generation_type_id=None,
                                                         date_end=date_end)
+    if generation_df.empty:
+        raise NoDataAvailableError(f"No data available for region '{region_code}' in the period '{datetime_start}' - '{datetime_end}'")
     logging.debug('Retrieved generation data')
     environmental_impacts_df = await get_calculation_data(engine=engine)
 
@@ -28,7 +31,6 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
     # Annotate generation data with units # TODO: Move to DB
     if 'GenerationUnit' not in generation_df.columns.to_list():
         generation_df['GenerationUnit'] = 'MJ'
-    generation_df.drop(['Id'], axis=1, inplace=True)
 
     # Remove unnecessary columns for calculation
     environmental_impacts_df.drop(['ReferenceYear'], axis=1, inplace=True)
@@ -39,12 +41,13 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
                        left_on='GenerationTypeId',
                        right_on='ElectricityGenerationTypeId')
 
-    # TODO: Move to database
+    calculation_df.drop(["GenerationTypeId"],axis=1,inplace=True)
     # Convert units
     calculation_df['ConversionFactor'] = calculation_df[['GenerationUnit','PerUnit']].apply(lambda x: conversion_factors[(x['GenerationUnit'],x['PerUnit'])],axis=1)
     calculation_df['AggregatedGenerationConverted'] = calculation_df['AggregatedGeneration'] * calculation_df['ConversionFactor']
     calculation_df['EnvironmentalImpact'] = calculation_df['AggregatedGenerationConverted']*calculation_df['ImpactValue']
 
+    # TODO: Move to database
     return calculation_df
 
 

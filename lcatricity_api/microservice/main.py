@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import datetime, timedelta
@@ -12,11 +13,12 @@ import uvicorn
 from starlette import status
 from starlette.responses import RedirectResponse
 
-from lcatricity_api.microservice.ResponseModels import GenerationResponseModel, ImpactResultSchema
+from lcatricity_api.microservice.ResponseModels import GenerationResponseModel, ImpactResultSchema, \
+    DataAvailabilityResponse
 from lcatricity_api.microservice.cache_queries import list_regions_in_cache, list_generation_types_in_cache, \
     list_generation_type_mappings_in_cache, list_impact_categories_df_in_cache, init_cache
 from lcatricity_api.microservice.calculate import calculate_impact_df
-from lcatricity_api.microservice.constants import ServerError
+from lcatricity_api.microservice.constants import ServerError, NoDataAvailableError
 from lcatricity_api.microservice.data_availability import get_regions_with_generation_data, get_datapoints_per_day
 from lcatricity_api.microservice.generation import get_electricity_generation_df
 
@@ -103,18 +105,24 @@ async def list_generation_type_mappings():
     return Response(generation_type_mappings_df.to_json(orient='records'), media_type="application/json")
 
 
-@app.get("/available_data_region")
-async def availability_regions(datestamp: Optional[str] = None):
+@app.get("/available_data_region",response_model=DataAvailabilityResponse)
+async def availability_regions(date_start: Optional[str] = None, date_end: Optional[str] = None, max_rows: Optional[int] = 1000):
     """
         Get info on the available generation data per region. Returns a JSON with keys RegionId, EarliestTimeStamp, LatestTimeStamp,CountDataPoints
 
-        I
-        :param datestamp: Datestamp in the format yyyy-mm-dd. If None, then will return information on the earliest, last and count of data points for the region stored over all time in the database.
+        Note that in several regions the electricity grid operator does not provide electricity data via the ENTSO-E
+        Transparency Platform to our knowledge, or not within the region specified. In this case, the region is
+        listed with null start and end datestamp, and data point count = 0
+
+        :param date_start: Start date in the format yyyy-mm-dd. If None, then will return information on the earliest, last and count of data points for the region stored over all time in the database.
+        :param date_end:  End date of the period to search in the format yyyy-mm-dd. If None and date_start is a datestamp, then will be set to date_start+1day
+        :param max_rows: Maximum number of rows to return. By default = 1000. Maximum is 100000
+
         :return:
         """
 
-    data_availability_df = await get_regions_with_generation_data(engine, datestamp)
-    return Response(data_availability_df.to_json(orient='records'), media_type="application/json")
+    data_availability_df = await get_regions_with_generation_data(engine, date_start=date_start, date_end=date_end, max_rows=1000)
+    return Response(data_availability_df.to_json(orient='records',date_format='iso'), media_type="application/json")
 
 
 @app.get("/datapoints_count_by_day")
@@ -128,7 +136,7 @@ async def datapoints_count_by_day(region_code: Optional[str]):
         """
 
     datapoint_counts_df = await get_datapoints_per_day(engine, region_code=region_code)
-    return Response(datapoint_counts_df.to_json(orient='records'), media_type="application/json")
+    return Response(datapoint_counts_df.to_json(orient='records',date_format='iso'), media_type="application/json")
 
 
 @app.get('/list_impact_categories')
@@ -170,7 +178,7 @@ async def get_electricity_generation(date_start: str, region_code: str, date_end
     return Response(df.to_json(orient='records',date_format='iso'), media_type="application/json")
 
 
-@app.get('/calculate', response_model=ImpactResultSchema)
+@app.get('/calculate', response_model=List[ImpactResultSchema])
 async def calculate_impact(date_start: str, region_code: str, impact_category_id: int, date_end: str = None) -> Any:
     """
     Get environmental impacts of electricity generation on given date (e.g. 2024-02-01) for a given region (e.g. NL or FR) and an electricity regions type (e.g. 4 for fossil gas)
@@ -188,6 +196,8 @@ async def calculate_impact(date_start: str, region_code: str, impact_category_id
     try:
         impact_df = await calculate_impact_df(date_start, date_end, region_code, impact_category_id=impact_category_id,
                                               engine=engine)
+    except NoDataAvailableError as exc:
+        return Response(status_code=400, content=json.dumps({'response': 400, 'error_info': exc.message}), media_type='text/json')
     except TypeError as e:
         return Response(status_code=400, content=str(e))
     except ValueError as e:

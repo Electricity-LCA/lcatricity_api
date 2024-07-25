@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import literal
 from sqlalchemy.orm import sessionmaker
 
-from lcatricity_api.microservice.constants import ServerError, ROW_LIMIT
+from lcatricity_api.microservice.constants import ServerError, ROW_LIMIT, NoDataAvailableError
 from lcatricity_dataschema.base import Regions, ElectricityGeneration
 
 
