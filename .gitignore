@@ -97,3 +97,4 @@ target/
 /docker-compose.digitalocean.yml
 /.env.local
 /.env.digitalocean
+/docker-compose.*
