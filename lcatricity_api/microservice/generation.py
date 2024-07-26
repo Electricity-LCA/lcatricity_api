@@ -6,38 +6,13 @@ import pandas as pd
 from sqlalchemy import literal
 from sqlalchemy.orm import sessionmaker
 
-from lcatricity_api.microservice.constants import ServerError, ROW_LIMIT, NoDataAvailableError
+from lcatricity_api.microservice.constants import ServerError, NoDataAvailableError
 from lcatricity_dataschema.base import Regions, ElectricityGeneration
 
 
-async def get_electricity_generation_all_generationtypes_df(date_start, date_end, region_code: str,
-                                                            engine) -> pd.DataFrame:
-    if not isinstance(region_code, str):
-        raise TypeError('Invalid region code. Region code must be a string')
-    session_obj = sessionmaker(bind=engine)
-    with session_obj() as session:
-        impacts_query = session.query(Regions.Id).where(Regions.Code == region_code).limit(1)
-
-        region_id_df = pd.read_sql(impacts_query.statement, session.bind)
-        if region_id_df is None or region_id_df.shape[0] == 0:
-            raise ValueError(f'Region Code `{region_code}` could not be found in database')
-        elif region_id_df.shape[0] > 1:
-            raise ServerError(
-                f'More than one region found for region code `{region_code}`. There is probably an error in the database')
-
-        region_id = int(region_id_df.iat[0, 0])
-        logging.debug(f'REGION IS {region_id}')
-
-        query = (session.query(ElectricityGeneration)
-                 .where(ElectricityGeneration.RegionId == region_id)
-                 .limit(ROW_LIMIT))
-
-        df = pd.read_sql(query.statement, session.bind)
-    return df
-
-
 async def get_electricity_generation_df(date_start: str, region_code: str, engine,
-                                        generation_type_id: Optional[int] = None, date_end: str = None) -> pd.DataFrame:
+                                        generation_type_id: Optional[int] = None, date_end: str = None,
+                                        max_datapoints: int = 1000) -> pd.DataFrame:
     """Get electricity generation on a given day"""
     if not isinstance(region_code, str):
         raise TypeError('Invalid region code. Region code must be a string')
@@ -82,12 +57,12 @@ async def get_electricity_generation_df(date_start: str, region_code: str, engin
             query = (session.query(ElectricityGeneration)
                      .with_entities(literal(region_code).label('RegionCode'),
                                     ElectricityGeneration.DateStamp,
-                                   ElectricityGeneration.GenerationTypeId, ElectricityGeneration.AggregatedGeneration)
+                                    ElectricityGeneration.GenerationTypeId, ElectricityGeneration.AggregatedGeneration)
                      .where(ElectricityGeneration.GenerationTypeId == generation_type_id)
                      .where(ElectricityGeneration.RegionId == region_id)
                      .where((ElectricityGeneration.DateStamp >= date_start)
                             & (ElectricityGeneration.DateStamp <= date_end))
-                     .limit(ROW_LIMIT))
+                     )
         else:
             query = (session.query(ElectricityGeneration)
                      .with_entities(literal(region_code).label('RegionCode'),
@@ -96,6 +71,20 @@ async def get_electricity_generation_df(date_start: str, region_code: str, engin
                      .where(ElectricityGeneration.RegionId == region_id)
                      .where((ElectricityGeneration.DateStamp >= date_start)
                             & (ElectricityGeneration.DateStamp <= date_end))
-                     .limit(ROW_LIMIT))
+                     )
         df = pd.read_sql(query.statement, session.bind)
-    return df
+        df = df.set_index('DateStamp')
+        final_df = df.copy(deep=True)
+        resample_options = ['H', '4H', '6H', 'D', 'ME']
+        resample_attempt = 0
+        logging.debug(
+            f'{final_df.shape[0]} rows returned from generation table for {region_code} in period {date_start}-{date_end}')
+        while final_df.shape[0] > max_datapoints:
+            logging.debug(f'Resample attempt {resample_attempt}')
+            if resample_attempt > len(resample_options) - 1:
+                raise Exception('Too much data to be returned')
+            final_df = final_df.resample(resample_options[resample_attempt]).median(numeric_only=True)
+            logging.debug(f'{final_df.shape[0]} rows in generation_df after resample attempt {resample_attempt}')
+            resample_attempt += 1
+        final_df = final_df.reset_index()
+    return final_df

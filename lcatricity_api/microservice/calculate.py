@@ -10,7 +10,7 @@ from lcatricity_api.microservice.generation import get_electricity_generation_df
 from lcatricity_dataschema.base import EnvironmentalImpacts
 
 
-async def calculate_impact_df(date_start: str, date_end: str, region_code: str, impact_category_id: int, engine, max_rows: Optional[int] = 1000):
+async def calculate_impact_df(date_start: str, date_end: str, region_code: str, impact_category_id: int, engine):
     logging.debug(
         f'Getting electricity generation data for date {date_start}, region code {region_code}, impact category id {impact_category_id}')
     try:
@@ -23,10 +23,10 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
     generation_df = await get_electricity_generation_df(date_start, region_code, engine=engine, generation_type_id=None,
                                                         date_end=date_end)
     if generation_df.empty:
-        raise NoDataAvailableError(f"No data available for region '{region_code}' in the period '{datetime_start}' - '{datetime_end}'")
+        raise NoDataAvailableError(
+            f"No data available for region '{region_code}' in the period '{datetime_start}' - '{datetime_end}'")
     logging.debug('Retrieved generation data')
-    environmental_impacts_df = await get_calculation_data(engine=engine,impact_category_id=impact_category_id)
-
+    environmental_impacts_df = await get_calculation_data(engine=engine, impact_category_id=impact_category_id)
 
     # Annotate generation data with units # TODO: Move to DB
     if 'GenerationUnit' not in generation_df.columns.to_list():
@@ -38,28 +38,30 @@ async def calculate_impact_df(date_start: str, date_end: str, region_code: str, 
 
     # Join dataframes
     calculation_df = generation_df.merge(environmental_impacts_df,
-                       left_on='GenerationTypeId',
-                       right_on='ElectricityGenerationTypeId')
+                                         left_on='GenerationTypeId',
+                                         right_on='ElectricityGenerationTypeId')
 
-    calculation_df.drop(["GenerationTypeId"],axis=1,inplace=True)
+    calculation_df.drop(["GenerationTypeId"], axis=1, inplace=True)
     # Convert units
-    calculation_df['ConversionFactor'] = calculation_df[['GenerationUnit','PerUnit']].apply(lambda x: conversion_factors[(x['GenerationUnit'],x['PerUnit'])],axis=1)
-    calculation_df['AggregatedGenerationConverted'] = calculation_df['AggregatedGeneration'] * calculation_df['ConversionFactor']
-    calculation_df['EnvironmentalImpact'] = calculation_df['AggregatedGenerationConverted']*calculation_df['ImpactValue']
+    calculation_df['ConversionFactor'] = calculation_df[['GenerationUnit', 'PerUnit']].apply(
+        lambda x: conversion_factors[(x['GenerationUnit'], x['PerUnit'])], axis=1)
+    calculation_df['AggregatedGenerationConverted'] = calculation_df['AggregatedGeneration'] * calculation_df[
+        'ConversionFactor']
+    calculation_df['EnvironmentalImpact'] = calculation_df['AggregatedGenerationConverted'] * calculation_df[
+        'ImpactValue']
 
     # TODO: Move to database
     return calculation_df
 
 
-
-
-async def get_calculation_data(engine,impact_category_id:Optional[int]=None) -> pd.DataFrame:
+async def get_calculation_data(engine, impact_category_id: Optional[int] = None) -> pd.DataFrame:
     session_obj = sessionmaker(bind=engine)
     with session_obj() as session:
         if impact_category_id is None:
             impacts_query = session.query(EnvironmentalImpacts)
         else:
-            impacts_query = session.query(EnvironmentalImpacts).where(EnvironmentalImpacts.ImpactCategoryId==impact_category_id)
+            impacts_query = session.query(EnvironmentalImpacts).where(
+                EnvironmentalImpacts.ImpactCategoryId == impact_category_id)
         impacts_df = pd.read_sql(impacts_query.statement, session.bind)
         # if isinstance(EnvironmentalImpactsSchema.validate(impacts_df), (SchemaError, SchemaErrors)):
         #     logging.error('Schema error in environmental impacts data returned from database')
