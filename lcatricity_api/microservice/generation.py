@@ -57,7 +57,8 @@ async def get_electricity_generation_df(date_start: str, region_code: str, engin
             query = (session.query(ElectricityGeneration)
                      .with_entities(literal(region_code).label('RegionCode'),
                                     ElectricityGeneration.DateStamp,
-                                    ElectricityGeneration.GenerationTypeId, ElectricityGeneration.AggregatedGeneration)
+                                    ElectricityGeneration.GenerationTypeId,
+                                    ElectricityGeneration.AggregatedGeneration)
                      .where(ElectricityGeneration.GenerationTypeId == generation_type_id)
                      .where(ElectricityGeneration.RegionId == region_id)
                      .where((ElectricityGeneration.DateStamp >= date_start)
@@ -67,7 +68,8 @@ async def get_electricity_generation_df(date_start: str, region_code: str, engin
             query = (session.query(ElectricityGeneration)
                      .with_entities(literal(region_code).label('RegionCode'),
                                     ElectricityGeneration.DateStamp,
-                                    ElectricityGeneration.GenerationTypeId, ElectricityGeneration.AggregatedGeneration)
+                                    ElectricityGeneration.GenerationTypeId,
+                                    ElectricityGeneration.AggregatedGeneration)
                      .where(ElectricityGeneration.RegionId == region_id)
                      .where((ElectricityGeneration.DateStamp >= date_start)
                             & (ElectricityGeneration.DateStamp <= date_end))
@@ -84,6 +86,7 @@ async def get_electricity_generation_df(date_start: str, region_code: str, engin
             if resample_attempt > len(resample_options) - 1:
                 raise Exception('Too much data to be returned')
             final_df = final_df.resample(resample_options[resample_attempt]).median(numeric_only=True)
+            final_df['RegionCode'] = region_code # Re-introduce the region code. It's a string so it gets removed in the resampling on numeric values
             logging.debug(f'{final_df.shape[0]} rows in generation_df after resample attempt {resample_attempt}')
             resample_attempt += 1
         final_df = final_df.reset_index()
