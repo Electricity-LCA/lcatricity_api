@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html  lang="en,pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>lcatricity_api.data package</title>
+    
+          <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="_static/theme.css " type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="_static/documentation_options.js?v=2d1da3f8"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="_static/theme-vendors.js"></script> -->
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="lcatricity_api.microservice package" href="lcatricity_api.microservice.html" />
+  <link rel="prev" title="lcatricity_api package" href="lcatricity_api.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <span class="site-name">LCAtricity API</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lcatricity-api-s-documentation">Contents:</a></span>
+      </p>
+      <ul class="">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="modules.html" class="reference internal ">lcatricity_api</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="installation-setup.html" class="reference internal ">Set up LCAtricity</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="running.html" class="reference internal ">Running API via Docker</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="modules.html">lcatricity_api</a> &raquo;</li>
+    
+      <li><a href="lcatricity_api.html">lcatricity_api package</a> &raquo;</li>
+    
+    <li>lcatricity_api.data package</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="lcatricity_api.html"
+       title="previous chapter">← lcatricity_api package</a>
+  </li>
+  <li class="next">
+    <a href="lcatricity_api.microservice.html"
+       title="next chapter">lcatricity_api.microservice package →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="lcatricity-api-data-package">
+<h1>lcatricity_api.data package<a class="headerlink" href="#lcatricity-api-data-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-lcatricity_api.data.get_common_data">
+<span id="lcatricity-api-data-get-common-data-module"></span><h2>lcatricity_api.data.get_common_data module<a class="headerlink" href="#module-lcatricity_api.data.get_common_data" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lcatricity_api.data.get_common_data.</span></span><span class="sig-name descname"><span class="pre">BasicDataCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generation_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation_type_mappings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impact_categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retrieved_timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A cache of common data</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache.generation_type_mappings">
+<span class="sig-name descname"><span class="pre">generation_type_mappings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache.generation_type_mappings" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache.generation_types">
+<span class="sig-name descname"><span class="pre">generation_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache.generation_types" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache.impact_categories">
+<span class="sig-name descname"><span class="pre">impact_categories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache.impact_categories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache.regions">
+<span class="sig-name descname"><span class="pre">regions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataFrame</span></em><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache.regions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.BasicDataCache.retrieved_timestamp">
+<span class="sig-name descname"><span class="pre">retrieved_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#lcatricity_api.data.get_common_data.BasicDataCache.retrieved_timestamp" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lcatricity_api.data.get_common_data.load_common_data_from_db">
+<span class="sig-prename descclassname"><span class="pre">lcatricity_api.data.get_common_data.</span></span><span class="sig-name descname"><span class="pre">load_common_data_from_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql_engine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#lcatricity_api.data.get_common_data.BasicDataCache" title="lcatricity_api.data.get_common_data.BasicDataCache"><span class="pre">BasicDataCache</span></a></span></span><a class="headerlink" href="#lcatricity_api.data.get_common_data.load_common_data_from_db" title="Link to this definition">¶</a></dt>
+<dd><p>Load common data from the database and return as a BasicDataCache object</p>
+</dd></dl>
+
+</section>
+<section id="module-lcatricity_api.data.store_generation_data">
+<span id="lcatricity-api-data-store-generation-data-module"></span><h2>lcatricity_api.data.store_generation_data module<a class="headerlink" href="#module-lcatricity_api.data.store_generation_data" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lcatricity_api.data.store_generation_data.store_generation_data_to_db">
+<span class="sig-prename descclassname"><span class="pre">lcatricity_api.data.store_generation_data.</span></span><span class="sig-name descname"><span class="pre">store_generation_data_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generation_mw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation_type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql_engine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Engine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#lcatricity_api.data.store_generation_data.store_generation_data_to_db" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Store electricity time series power generation data to elec_lca database. Uses an upsert approach, removing any</dt><dd><p>existing generation data for the same interval and region id (as it is likely outdated or null, as new data is generated continuously).</p>
+</dd>
+</dl>
+<p>&#64;param generation_mw: Pandas Series with the generation data (MW per time interval) to insert. The index should be the timestamps of the beginning of each interval
+&#64;param generation_type_id: Internal generation type id (int)
+&#64;param region_id: Internal region id (int)
+&#64;param sql_engine: SQL engine to the elec_lca database
+&#64;return:</p>
+</dd></dl>
+
+</section>
+<section id="module-lcatricity_api.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lcatricity_api.data" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="lcatricity_api.html"
+       title="previous chapter">← lcatricity_api package</a>
+  </li>
+  <li class="next">
+    <a href="lcatricity_api.microservice.html"
+       title="next chapter">lcatricity_api.microservice package →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2024, Artur Donaldson.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.4.7 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

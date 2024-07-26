@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html  lang="en,pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>Set up LCAtricity</title>
+    
+          <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="_static/theme.css " type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="_static/documentation_options.js?v=2d1da3f8"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="_static/theme-vendors.js"></script> -->
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Index" href="genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="next" title="Running API via Docker" href="running.html" />
+  <link rel="prev" title="lcatricity_api.orm package" href="lcatricity_api.orm.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <span class="site-name">LCAtricity API</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Quick search</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Search" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#welcome-to-lcatricity-api-s-documentation">Contents:</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="modules.html" class="reference internal ">lcatricity_api</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">Set up LCAtricity</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#set-up-environment" class="reference internal">Set up environment</a></li>
+                
+                  <li class="toctree-l2"><a href="#set-up-database" class="reference internal">Set up database</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="running.html" class="reference internal ">Running API via Docker</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+    <li>Set up LCAtricity</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="lcatricity_api.orm.html"
+       title="previous chapter">← lcatricity_api.orm package</a>
+  </li>
+  <li class="next">
+    <a href="running.html"
+       title="next chapter">Running API via Docker →</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="set-up-lcatricity">
+<h1>Set up LCAtricity<a class="headerlink" href="#set-up-lcatricity" title="Link to this heading">¶</a></h1>
+<p>::
+<em>PSST</em> ... If you just want to check out the API, we're live at <a class="reference external" href="http://example.lcatricity.live:8000/docs">http://example.lcatricity.live:8000/docs</a>.</p>
+<section id="set-up-environment">
+<h2>Set up environment<a class="headerlink" href="#set-up-environment" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Create an ENTSO-E account and request an API key</p></li>
+<li><p>Decide on a place to run a database and <a class="reference external" href="https://www.postgresql.org/docs/current/tutorial-install.html">setup
+postgres</a>.</p></li>
+<li><p>Create an empty database called <code class="docutils literal notranslate"><span class="pre">electricity_lca</span></code> and create a user
+account with privilege to create tables on the database</p></li>
+<li><p>Clone this repository</p></li>
+<li><p>Copy <code class="docutils literal notranslate"><span class="pre">.env.template</span></code> to a new file <code class="docutils literal notranslate"><span class="pre">.env</span></code> and fill the
+copied file with <code class="docutils literal notranslate"><span class="pre">ENTSOE_SECURITY_TOKEN</span></code> = your ENTSOE security
+token. Fill also the connection details to your postgres sql instance</p></li>
+<li><p>Create Python virtual environment</p></li>
+</ol>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>venv create elec_lca_venv
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li><p>Install requirements</p></li>
+</ol>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>pip install -r requirement.txt
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">src/setup/setup.py</span></code> to initalize the database schema
+and load static data</p></li>
+<li><p>Run all tests under <code class="docutils literal notranslate"><span class="pre">tests/</span></code></p></li>
+</ol>
+</section>
+<section id="set-up-database">
+<h2>Set up database<a class="headerlink" href="#set-up-database" title="Link to this heading">¶</a></h2>
+<p>Run</p>
+<div class="highlight-commandline notranslate"><div class="highlight"><pre><span></span>python src/setup/setup.py
+</pre></div>
+</div>
+<blockquote>
+<div><p>This creates the tables in the database and fills the constant value
+(e.g. environmental impacts, regions, electricity generation types)
+using the data in the <code class="docutils literal notranslate"><span class="pre">data/</span></code> directory</p>
+</div></blockquote>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="lcatricity_api.orm.html"
+       title="previous chapter">← lcatricity_api.orm package</a>
+  </li>
+  <li class="next">
+    <a href="running.html"
+       title="next chapter">Running API via Docker →</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Copyright 2024, Artur Donaldson.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.4.7 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.9.1.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>
